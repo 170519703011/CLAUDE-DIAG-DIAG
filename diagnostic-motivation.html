@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostic Motivation — Baromètre de démotivation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f7f6f3;
+    color: #1a1a18;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .header .tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7F77DD;
+    background: #EEEDFE;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a18;
+    margin-bottom: 0.5rem;
+  }
+
+  .header p {
+    font-size: 15px;
+    color: #5F5E5A;
+    line-height: 1.6;
+  }
+
+  .author {
+    font-size: 13px;
+    color: #888780;
+    margin-top: 0.4rem;
+  }
+
+  .tab-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    background: #fff;
+    border: 0.5px solid #ddd;
+    border-radius: 12px;
+    padding: 6px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #888780;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: #7F77DD;
+    color: #fff;
+  }
+
+  .question {
+    background: #fff;
+    border: 0.5px solid #e0dfd8;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .q-label {
+    font-size: 14px;
+    color: #1a1a18;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .q-scale {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .q-scale input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: #e0dfd8;
+    outline: none;
+  }
+
+  .q-scale input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #7F77DD;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  .q-val {
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: right;
+    color: #7F77DD;
+  }
+
+  .q-hints {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+
+  .q-hint {
+    font-size: 11px;
+    color: #B4B2A9;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 12px;
+    border: none;
+    background: #7F77DD;
+    color: #fff;
+    margin-top: 1rem;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .submit-btn:hover { background: #534AB7; }
+  .submit-btn:active { transform: scale(0.98); }
+
+  .result-card {
+    background: #fff;
+    border: 0.5px solid #e0dfd8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: none;
+  }
+
+  .score-big {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0.5rem 0;
+  }
+
+  .score-track {
+    height: 10px;
+    border-radius: 6px;
+    background: #f1efe8;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+  }
+
+  .score-msg {
+    font-size: 14px;
+    line-height: 1.7;
+    margin-top: 8px;
+  }
+
+  .signal-item {
+    background: #f7f6f3;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+
+  .signal-label {
+    font-size: 13px;
+    color: #1a1a18;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .signal-track {
+    height: 5px;
+    border-radius: 3px;
+    background: #e0dfd8;
+    overflow: hidden;
+  }
+
+  .signal-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444441;
+    margin: 1.25rem 0 0.75rem;
+  }
+
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 0.5px solid #ddd;
+    background: transparent;
+    color: #5F5E5A;
+    margin-top: 12px;
+    transition: background 0.2s;
+  }
+
+  .reset-btn:hover { background: #f1efe8; }
+
+  .footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid #e0dfd8;
+    font-size: 12px;
+    color: #B4B2A9;
+    line-height: 1.7;
+  }
+
+  .footer strong {
+    color: #7F77DD;
+    font-weight: 600;
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 22px; }
+    .tab-btn { font-size: 13px; padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="tag">Outil de diagnostic</div>
+    <h1>Baromètre de démotivation</h1>
+    <p>Répondez intuitivement — il n'y a pas de bonne réponse.<br>Juste la vôtre.</p>
+    <p class="author">Un outil proposé par votre coach</p>
+  </div>
+
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchProfile('collab')">Je suis collaborateur</button>
+    <button class="tab-btn" onclick="switchProfile('dirigeant')">Je suis dirigeant</button>
+  </div>
+
+  <div id="questions-zone"></div>
+
+  <div class="result-card" id="result-zone">
+    <p style="font-size:13px;color:#888780;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Score de démotivation</p>
+    <p class="score-big" id="score-val">—</p>
+    <div class="score-track"><div class="score-fill" id="score-bar"></div></div>
+    <p class="score-msg" id="score-msg"></p>
+
+    <p class="section-title" style="margin-top:1.5rem;">Les 3 signaux les plus forts</p>
+    <div id="top-signals"></div>
+
+    <p class="section-title" style="margin-top:1.5rem;">La prochaine étape</p>
+    <p style="font-size:13px;color:#5F5E5A;line-height:1.7;" id="next-step"></p>
+
+    <button class="reset-btn" onclick="resetDiag()">Recommencer le diagnostic</button>
+  </div>
+
+  <div class="footer">
+    <p>Cet outil a été conçu pour initier une réflexion, pas pour poser un diagnostic définitif.</p>
+    <p>Pour aller plus loin : <strong>contactez votre coach</strong></p>
+  </div>
+
+</div>
+
+<script>
+const profiles = {
+  collab: [
+    { id:'c1', q:'Mon travail est reconnu à sa juste valeur.', inv: true },
+    { id:'c2', q:'Mon manager tient ses promesses.', inv: true },
+    { id:'c3', q:'Je suis consulté(e) sur les décisions qui me concernent.', inv: true },
+    { id:'c4', q:'Les valeurs affichées de mon entreprise correspondent à la réalité.', inv: true },
+    { id:'c5', q:'J\'assiste régulièrement à des réunions où rien ne se décide.', inv: false },
+    { id:'c6', q:'Je me sens interchangeable dans mon poste.', inv: false },
+    { id:'c7', q:'Je vois des perspectives d\'évolution claires pour moi.', inv: true },
+    { id:'c8', q:'Il y a des règles du jeu différentes selon les personnes dans mon équipe.', inv: false },
+  ],
+  dirigeant: [
+    { id:'d1', q:'Je porte souvent des décisions difficiles seul(e), sans pouvoir en parler.', inv: false },
+    { id:'d2', q:'Les résultats reflètent l\'énergie que j\'investis.', inv: true },
+    { id:'d3', q:'Mon cap stratégique change fréquemment sous pression externe.', inv: false },
+    { id:'d4', q:'J\'ai des pairs avec qui je peux être vraiment franc(he).', inv: true },
+    { id:'d5', q:'Je passe plus de temps à éteindre des incendies qu\'à piloter.', inv: false },
+    { id:'d6', q:'Je me souviens clairement pourquoi j\'ai créé ou rejoint cette organisation.', inv: true },
+    { id:'d7', q:'Je perds de bons collaborateurs que je n\'arrive pas à retenir.', inv: false },
+    { id:'d8', q:'Je trouve encore du sens dans ce que je fais au quotidien.', inv: true },
+  ]
+};
+
+let currentProfile = 'collab';
+let values = {};
+
+function switchProfile(p) {
+  currentProfile = p;
+  values = {};
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && p==='collab') || (i===1 && p==='dirigeant'));
+  });
+  document.getElementById('result-zone').style.display = 'none';
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const qs = profiles[currentProfile];
+  const zone = document.getElementById('questions-zone');
+  zone.innerHTML = '';
+  qs.forEach(q => {
+    const val = values[q.id] !== undefined ? values[q.id] : 5;
+    const div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = `
+      <p class="q-label">${q.q}</p>
+      <div class="q-scale">
+        <input type="range" min="1" max="10" step="1" value="${val}" id="range-${q.id}" oninput="updateVal('${q.id}', this.value)">
+        <span class="q-val" id="display-${q.id}">${val}/10</span>
+      </div>
+      <div class="q-hints">
+        <span class="q-hint">1 — Pas du tout</span>
+        <span class="q-hint">10 — Tout à fait</span>
+      </div>
+    `;
+    zone.appendChild(div);
+    values[q.id] = val;
+  });
+
+  const btn = document.createElement('button');
+  btn.className = 'submit-btn';
+  btn.textContent = 'Voir mon diagnostic →';
+  btn.onclick = computeResult;
+  zone.appendChild(btn);
+}
+
+function updateVal(id, v) {
+  values[id] = parseInt(v);
+  document.getElementById('display-' + id).textContent = v + '/10';
+}
+
+function computeResult() {
+  const qs = profiles[currentProfile];
+  let total = 0;
+  let signals = [];
+
+  qs.forEach(q => {
+    const raw = values[q.id] || 5;
+    const demotScore = q.inv ? (11 - raw) : raw;
+    total += demotScore;
+    signals.push({ label: q.q, score: demotScore });
+  });
+
+  const pct = Math.round((total / (qs.length * 10)) * 100);
+  signals.sort((a,b) => b.score - a.score);
+  const top3 = signals.slice(0, 3);
+
+  const fillColor = pct < 35 ? '#1D9E75' : pct < 60 ? '#BA7517' : '#E24B4A';
+  const bar = document.getElementById('score-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = fillColor;
+
+  document.getElementById('score-val').textContent = pct + '%';
+  document.getElementById('score-val').style.color = fillColor;
+
+  let msg, next;
+  if (pct < 35) {
+    msg = 'La motivation est globalement préservée. Quelques signaux à surveiller, mais rien d\'urgent. C\'est le bon moment pour consolider — pas d\'attendre que ça se dégrade.';
+    next = 'Profitez de cette période favorable pour renforcer ce qui fonctionne. Un accompagnement ponctuel peut vous aider à ancrer ces bonnes dynamiques durablement.';
+  } else if (pct < 60) {
+    msg = 'Des signaux d\'alerte sont présents. La démotivation s\'installe progressivement. Si rien ne change, la pente devient glissante. Une intervention ciblée aurait beaucoup d\'impact maintenant.';
+    next = 'Agir maintenant coûte moins cher — en énergie, en temps et en argent — qu\'après un désengagement avancé. Un diagnostic approfondi permettrait d\'identifier les leviers prioritaires.';
+  } else {
+    msg = 'Niveau de démotivation élevé. Le risque de désengagement est réel. Il est urgent d\'agir sur les signaux identifiés.';
+    next = 'Une conversation s\'impose. Ne laissez pas cette situation s\'installer — les conséquences sur la performance et le bien-être peuvent être importantes. Prenons le temps d\'en parler.';
+  }
+
+  document.getElementById('score-msg').textContent = msg;
+  document.getElementById('score-msg').style.color = pct < 35 ? '#0F6E56' : pct < 60 ? '#854F0B' : '#A32D2D';
+  document.getElementById('next-step').textContent = next;
+
+  const topZone = document.getElementById('top-signals');
+  topZone.innerHTML = '';
+  top3.forEach(s => {
+    const pctS = Math.round((s.score / 10) * 100);
+    const sColor = pctS > 65 ? '#E24B4A' : pctS > 40 ? '#BA7517' : '#1D9E75';
+    const d = document.createElement('div');
+    d.className = 'signal-item';
+    d.innerHTML = `
+      <p class="signal-label">${s.label}</p>
+      <div class="signal-track">
+        <div class="signal-fill" style="width:${pctS}%;background:${sColor};"></div>
+      </div>
+    `;
+    topZone.appendChild(d);
+  });
+
+  const resultZone = document.getElementById('result-zone');
+  resultZone.style.display = 'block';
+  setTimeout(() => resultZone.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function resetDiag() {
+  values = {};
+  document.getElementById('result-zone').style.display = 'none';
+  renderQuestions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
